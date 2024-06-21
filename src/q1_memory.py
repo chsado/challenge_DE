@@ -7,16 +7,21 @@ def q1_memory(file_path: str) -> List[Tuple[datetime.date, str]]:
     
     with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
-            tweet = json.loads(line)
-            date = datetime.strptime(tweet['date'][:10], '%Y-%m-%d').date()
-            user = tweet['user']['username']
+            try:
+                tweet = json.loads(line)
+                date = datetime.strptime(tweet['date'][:10], '%Y-%m-%d').date()
+                user = tweet['user']['username']
+                
+                if date not in user_count_per_date:
+                    user_count_per_date[date] = {}
+                if user not in user_count_per_date[date]:
+                    user_count_per_date[date][user] = 0
+                user_count_per_date[date][user] += 1
             
-            if date not in user_count_per_date:
-                user_count_per_date[date] = {}
-            if user not in user_count_per_date[date]:
-                user_count_per_date[date][user] = 0
-            user_count_per_date[date][user] += 1
-    
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON in line: {line}")
+                print(e)
+
     top_dates = sorted(user_count_per_date.items(), key=lambda x: sum(x[1].values()), reverse=True)[:10]
     result = [(date, max(users.items(), key=lambda x: x[1])[0]) for date, users in top_dates]
     

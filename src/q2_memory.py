@@ -9,10 +9,14 @@ def q2_memory(file_path: str) -> List[Tuple[str, int]]:
     
     with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
-            tweet = json.loads(line)
-            for emoji in emoji_pattern.findall(tweet['content']):
-                if emoji not in emoji_count:
-                    emoji_count[emoji] = 0
-                emoji_count[emoji] += 1
-    
+            try:
+                tweet = json.loads(line)
+                for emoji in emoji_pattern.findall(tweet['content']):
+                    if emoji not in emoji_count:
+                        emoji_count[emoji] = 0
+                    emoji_count[emoji] += 1
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON in line: {line}")
+                print(e)
+                
     return sorted(emoji_count.items(), key=lambda x: x[1], reverse=True)[:10]

@@ -10,8 +10,12 @@ def q3_time(file_path: str) -> List[Tuple[str, int]]:
     
     with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
-            tweet = json.loads(line)
-            mentions.update(mention[1:] for mention in mention_pattern.findall(tweet['content']))
-    
+            try:
+                tweet = json.loads(line)
+                mentions.update(mention[1:] for mention in mention_pattern.findall(tweet['content']))
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON in line: {line}")
+                print(e)
+                    
     return mentions.most_common(10)
 
